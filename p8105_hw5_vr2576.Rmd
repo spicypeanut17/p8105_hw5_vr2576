@@ -1,0 +1,60 @@
+---
+title: "P8105 Homework 5"
+author: "Vaiju Raja (vr2576)"
+date: "2024-11-15"
+output: github_document
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r lib}
+
+library(tidyverse)
+library(rvest)
+library(broom)
+
+set.seed(1)
+
+```
+
+
+## Problem 1: Birthday Simulation
+
+```{r q1, message = FALSE}
+
+# Create the function to simulate birthday matches within a group of size n
+birthday_sim <- function(n) {
+  birthdays <- sample(1:365, size = n, replace = TRUE)  # Simulate birthdays for n people, assuming 365 unique days
+  return(any(duplicated(birthdays)))  # Check for duplicates
+}
+
+
+# Simulation probability of a shared birthday for group sizes 2 to 50
+group_sizes <- 2:50 # Group size from 2 to 50
+num_sims <- 10000 # Number of simulations
+
+# Calculate average probability of shared birthdays for each group size
+results <- map_dbl(group_sizes, function(n) {
+  simulations <- replicate(num_sims, birthday_sim(n))
+  mean(simulations) # Prop of simulations with at least one shared birthday
+})
+
+# Data frame for plotting
+results_df <- tibble(group_size = group_sizes, probability = results)
+
+# Plot probability of shared birthdays by group size
+results_df %>%
+  ggplot(aes(x = group_size, y = probability)) +
+  geom_line(color = "steelblue") +
+  geom_point(color = "darkred") + 
+  labs(title = "Probability of Shared Birthdays by Group Size",
+    x = "Group Size",
+    y = "Probability of Shared Birthdays",
+    caption = "Simulation of 10,000 iterations per group size") +
+  theme_minimal()
+
+```
+
+The probability of having at least two people with shared birthdays in a group increases as the group size grows. This trend is clearly shown by the upward slope in the line plot, reflecting how the "birthday paradox" effect amplifies with larger groups.
+
